@@ -1,0 +1,2 @@
+1,Alice,alice@example.com,CUSTOMER
+2,Parth,parth@egen.ai,ADMIN
