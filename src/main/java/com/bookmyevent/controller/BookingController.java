@@ -40,7 +40,7 @@ public class BookingController {
     /** GET /bookings */
     @GetMapping
     public ResponseEntity<List<BookingResponse>> listBookings() {
-        List<BookingResponse> response = bookingService.listBookings().stream()
+        List<BookingResponse> response = bookingService.findAll().stream()
                 .map(BookingResponse::from)
                 .toList();
         return ResponseEntity.ok(response);
@@ -49,6 +49,6 @@ public class BookingController {
     /** GET /bookings/{id} */
     @GetMapping("/{id}")
     public ResponseEntity<BookingResponse> getBooking(@PathVariable long id) {
-        return ResponseEntity.ok(BookingResponse.from(bookingService.getBookingById(id)));
+        return ResponseEntity.ok(BookingResponse.from(bookingService.findById(id)));
     }
 }

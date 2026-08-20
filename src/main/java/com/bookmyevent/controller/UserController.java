@@ -61,7 +61,7 @@ public class UserController {
      */
     @GetMapping("/{id}")
     public ResponseEntity<UserResponse> getUser(@PathVariable long id) {
-        return ResponseEntity.ok(UserResponse.from(userService.getUserById(id)));
+        return ResponseEntity.ok(UserResponse.from(userService.findById(id)));
     }
 
     /**
@@ -70,7 +70,7 @@ public class UserController {
      */
     @GetMapping
     public ResponseEntity<List<UserResponse>> listUsers() {
-        List<UserResponse> response = userService.listUsers().stream()
+        List<UserResponse> response = userService.findAll().stream()
                 .map(UserResponse::from)
                 .toList();
         return ResponseEntity.ok(response);

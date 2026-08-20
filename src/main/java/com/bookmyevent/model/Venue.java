@@ -1,14 +1,17 @@
 package com.bookmyevent.model;
 
+import jakarta.persistence.Entity;
+import jakarta.persistence.Table;
+
+@Entity
+@Table(name = "venues")
 public class Venue extends BaseEntity {
     private String name;
     private String city;
     private int capacity;
 
     public Venue() {}
-
-    public Venue(long id, String name, String city, int capacity) {
-        super(id);
+    public Venue(String name, String city, int capacity) {
         this.name = name;
         this.city = city;
         this.capacity = capacity;
@@ -20,9 +23,4 @@ public class Venue extends BaseEntity {
     public void setCity(String city) { this.city = city; }
     public int getCapacity() { return capacity; }
     public void setCapacity(int capacity) { this.capacity = capacity; }
-
-    @Override
-    public String toString() {
-        return "Venue{id=" + getId() + ", name='" + name + "', city='" + city + "', capacity=" + capacity + "}";
-    }
 }

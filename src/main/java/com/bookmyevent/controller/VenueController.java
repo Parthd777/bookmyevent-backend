@@ -25,20 +25,17 @@ public class VenueController {
         this.venueService = venueService;
     }
 
-    /** POST /venues — create a venue (ADMIN operation in Day 6) */
     @PostMapping
     public ResponseEntity<VenueResponse> createVenue(@Valid @RequestBody CreateVenueRequest request) {
         var venue = venueService.createVenue(request.getName(), request.getCity(), request.getCapacity());
         return ResponseEntity.status(HttpStatus.CREATED).body(VenueResponse.from(venue));
     }
 
-    /** GET /venues/{id} */
     @GetMapping("/{id}")
     public ResponseEntity<VenueResponse> getVenue(@PathVariable long id) {
-        return ResponseEntity.ok(VenueResponse.from(venueService.getVenueById(id)));
+        return ResponseEntity.ok(VenueResponse.from(venueService.findById(id)));
     }
 
-    /** GET /venues */
     @GetMapping
     public ResponseEntity<List<VenueResponse>> listVenues() {
         List<VenueResponse> response = venueService.listVenues().stream()

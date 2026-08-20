@@ -1,14 +1,17 @@
 package com.bookmyevent.model;
 
+import jakarta.persistence.Entity;
+import jakarta.persistence.Table;
+
+@Entity
+@Table(name = "users")
 public class User extends BaseEntity {
     private String name;
     private String email;
-    private String role;
+    private String role; 
 
     public User() {}
-
-    public User(long id, String name, String email, String role) {
-        super(id);
+    public User(String name, String email, String role) {
         this.name = name;
         this.email = email;
         this.role = role;
@@ -20,9 +23,4 @@ public class User extends BaseEntity {
     public void setEmail(String email) { this.email = email; }
     public String getRole() { return role; }
     public void setRole(String role) { this.role = role; }
-
-    @Override
-    public String toString() {
-        return "User{id=" + getId() + ", name='" + name + "', email='" + email + "', role='" + role + "'}";
-    }
 }

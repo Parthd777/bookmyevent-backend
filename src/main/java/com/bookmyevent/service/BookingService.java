@@ -1,69 +1,59 @@
 package com.bookmyevent.service;
 
-import com.bookmyevent.exception.BookingNotAllowedException;
 import com.bookmyevent.exception.EventFullException;
 import com.bookmyevent.model.Booking;
 import com.bookmyevent.model.BookingStatus;
 import com.bookmyevent.model.Event;
-import com.bookmyevent.storage.FileStorage;
+import com.bookmyevent.model.User;
+import com.bookmyevent.repository.BookingRepository;
 import org.springframework.stereotype.Service;
-
-import java.util.ArrayList;
-import java.util.Comparator;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.Map;
-import java.util.Optional;
-import java.util.concurrent.ConcurrentHashMap;
 
 @Service
 public class BookingService {
-
-    private final Map<Long, Booking> bookingsById = new ConcurrentHashMap<>();
-    private final FileStorage fileStorage;
-    private final UserService userService;
+    
+    private final BookingRepository bookingRepository;
     private final EventService eventService;
-    private long nextId = 1;
-
-    public BookingService(FileStorage fileStorage, UserService userService, EventService eventService) {
-        this.fileStorage = fileStorage;
-        this.userService = userService;
+    private final UserService userService;
+    
+    public BookingService(BookingRepository bookingRepository, EventService eventService, UserService userService) {
+        this.bookingRepository = bookingRepository;
         this.eventService = eventService;
-        this.bookingsById.putAll(fileStorage.loadBookings());
-        if (!bookingsById.isEmpty()) {
-            nextId = bookingsById.keySet().stream().max(Comparator.naturalOrder()).orElse(0L) + 1;
-        }
+        this.userService = userService;
     }
-
-    public Booking createBooking(long userId, long eventId, int seatsBooked) {
-        userService.getUserById(userId); // throws UserNotFoundException if absent
-
-        Event event = eventService.getEventById(eventId); // throws BookingNotAllowedException if absent
-        if (seatsBooked <= 0) {
-            throw new BookingNotAllowedException("Seats must be positive.");
+    
+    public Booking createBooking(long userId, long eventId, int numberOfSeats) {
+        User user = userService.findById(userId);
+        Event event = eventService.findById(eventId);
+        
+        if (event.getAvailableSeats() < numberOfSeats) {
+            throw new EventFullException("Not enough seats available");
         }
-        if (event.getAvailableSeats() < seatsBooked) {
-            throw new EventFullException("Not enough seats available for event: " + event.getName());
-        }
-
-        Booking booking = new Booking(nextId++, userId, eventId, seatsBooked, BookingStatus.CONFIRMED);
-        bookingsById.put(booking.getId(), booking);
-
-        event.setAvailableSeats(event.getAvailableSeats() - seatsBooked);
-        fileStorage.saveBookings(listBookings());
-        eventService.persistEvents();
-
-        return booking;
+        
+        Booking booking = new Booking(user, event, numberOfSeats, BookingStatus.CONFIRMED);
+        LocalDateTime now = LocalDateTime.now(ZoneId.systemDefault());
+        booking.setCreatedAt(now);
+        booking.setUpdatedAt(now);
+        
+        event.setAvailableSeats(event.getAvailableSeats() - numberOfSeats);
+        event.setUpdatedAt(now);
+        eventService.updateEvent(event);
+        
+        return bookingRepository.save(booking);
     }
-
+    
     public Booking getBookingById(long id) {
-        return Optional.ofNullable(bookingsById.get(id))
-                .orElseThrow(() -> new BookingNotAllowedException("Booking not found with id " + id));
+        return bookingRepository.findById(id)
+            .orElseThrow(() -> new RuntimeException("Booking not found"));
     }
 
-    public List<Booking> listBookings() {
-        return new ArrayList<>(bookingsById.values());
+    public List<Booking> findAll() {
+        return bookingRepository.findAll();
+    }
+
+    public Booking findById(long id) {
+        return getBookingById(id);
     }
 }

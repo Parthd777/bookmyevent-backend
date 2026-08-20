@@ -1,33 +1,46 @@
 package com.bookmyevent.model;
 
+import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
+import jakarta.persistence.Table;
+
+@Entity
+@Table(name = "bookings")
 public class Booking extends BaseEntity {
-    private long userId;
-    private long eventId;
-    private int seatsBooked;
+    
+    @ManyToOne
+    @JoinColumn(name = "user_id", nullable = false)
+    private User user;
+    
+    @ManyToOne
+    @JoinColumn(name = "event_id", nullable = false)
+    private Event event;
+    
+    private int numberOfSeats;
+    
+    @Enumerated(EnumType.STRING)
     private BookingStatus status;
 
     public Booking() {}
-
-    public Booking(long id, long userId, long eventId, int seatsBooked, BookingStatus status) {
-        super(id);
-        this.userId = userId;
-        this.eventId = eventId;
-        this.seatsBooked = seatsBooked;
+    public Booking(User user, Event event, int numberOfSeats, BookingStatus status) {
+        this.user = user;
+        this.event = event;
+        this.numberOfSeats = numberOfSeats;
         this.status = status;
     }
 
-    public long getUserId() { return userId; }
-    public void setUserId(long userId) { this.userId = userId; }
-    public long getEventId() { return eventId; }
-    public void setEventId(long eventId) { this.eventId = eventId; }
-    public int getSeatsBooked() { return seatsBooked; }
-    public void setSeatsBooked(int seatsBooked) { this.seatsBooked = seatsBooked; }
+    public User getUser() { return user; }
+    public void setUser(User user) { this.user = user; }
+    
+    public Event getEvent() { return event; }
+    public void setEvent(Event event) { this.event = event; }
+    
+    public int getNumberOfSeats() { return numberOfSeats; }
+    public void setNumberOfSeats(int numberOfSeats) { this.numberOfSeats = numberOfSeats; }
+    
     public BookingStatus getStatus() { return status; }
     public void setStatus(BookingStatus status) { this.status = status; }
-
-    @Override
-    public String toString() {
-        return "Booking{id=" + getId() + ", userId=" + userId + ", eventId=" + eventId
-                + ", seatsBooked=" + seatsBooked + ", status=" + status + "}";
-    }
 }

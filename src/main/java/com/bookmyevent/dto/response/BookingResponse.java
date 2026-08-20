@@ -13,9 +13,9 @@ public class BookingResponse {
     public static BookingResponse from(Booking booking) {
         BookingResponse r = new BookingResponse();
         r.id = booking.getId();
-        r.userId = booking.getUserId();
-        r.eventId = booking.getEventId();
-        r.seatsBooked = booking.getSeatsBooked();
+        r.userId = booking.getUser().getId();
+        r.eventId = booking.getEvent().getId();
+        r.seatsBooked = booking.getNumberOfSeats();
         r.status = booking.getStatus();
         return r;
     }

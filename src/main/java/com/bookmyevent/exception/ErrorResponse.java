@@ -1,14 +1,7 @@
 package com.bookmyevent.exception;
 
 import java.time.LocalDateTime;
-
-/**
- * Structured error body returned by {@link GlobalExceptionHandler}.
- *
- * <p>Day 4 mentoring point: always return a consistent error schema from a REST API.
- * Exposing raw exception stack traces is a security risk and a poor client experience.
- * The client always sees this shape regardless of which exception was thrown internally.
- */
+import java.time.ZoneId;
 public class ErrorResponse {
 
     private int status;
@@ -20,7 +13,7 @@ public class ErrorResponse {
         this.status = status;
         this.error = error;
         this.message = message;
-        this.timestamp = LocalDateTime.now();
+        this.timestamp = LocalDateTime.now(ZoneId.systemDefault());
     }
 
     public int getStatus() { return status; }

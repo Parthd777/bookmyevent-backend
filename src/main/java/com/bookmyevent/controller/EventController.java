@@ -38,11 +38,12 @@ public class EventController {
      */
     @PostMapping
     public ResponseEntity<EventResponse> createEvent(@Valid @RequestBody CreateEventRequest request) {
-        venueService.getVenueById(request.getVenueId());       // validate venue exists
-        userService.getUserById(request.getOrganizerId());      // validate organizer exists
+        venueService.findById(request.getVenueId());       // validate venue exists
+        userService.findById(request.getOrganizerId());      // validate organizer exists
         var event = eventService.createEvent(
-                request.getName(), request.getEventDate(),
-                request.getVenueId(), request.getTotalSeats(), request.getOrganizerId());
+            request.getName(), request.getDescription(),
+            request.getVenueId(), request.getOrganizerId(),
+            request.getEventDate(), request.getTotalSeats());
         return ResponseEntity.status(HttpStatus.CREATED).body(EventResponse.from(event));
     }
 
@@ -67,6 +68,6 @@ public class EventController {
     /** GET /events/{id} */
     @GetMapping("/{id}")
     public ResponseEntity<EventResponse> getEvent(@PathVariable long id) {
-        return ResponseEntity.ok(EventResponse.from(eventService.getEventById(id)));
+        return ResponseEntity.ok(EventResponse.from(eventService.findById(id)));
     }
 }
