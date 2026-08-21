@@ -1,10 +1,15 @@
 package com.bookmyevent.model;
 
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
+import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @Table(name = "events")
@@ -12,13 +17,17 @@ public class Event extends BaseEntity {
     private String name;
     private String description;
     
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "venue_id", nullable = false)
     private Venue venue;
     
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "organizer_id", nullable = false)
     private User createdBy;
+
+    @OneToMany(mappedBy = "event", cascade = {CascadeType.PERSIST, CascadeType.REMOVE},
+            orphanRemoval = true, fetch = FetchType.LAZY)
+    private List<Booking> bookings = new ArrayList<>();
     
     private LocalDateTime eventDate;
     private int totalSeats;
@@ -55,4 +64,12 @@ public class Event extends BaseEntity {
     
     public int getAvailableSeats() { return availableSeats; }
     public void setAvailableSeats(int availableSeats) { this.availableSeats = availableSeats; }
+
+    public List<Booking> getBookings() { return bookings; }
+
+    /** Keeps both sides of the Event<->Booking relationship in sync. */
+    public void addBooking(Booking booking) {
+        bookings.add(booking);
+        booking.setEvent(this);
+    }
 }

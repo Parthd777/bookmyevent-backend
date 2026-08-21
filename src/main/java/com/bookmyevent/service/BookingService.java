@@ -36,6 +36,7 @@ public class BookingService {
         LocalDateTime now = LocalDateTime.now(ZoneId.systemDefault());
         booking.setCreatedAt(now);
         booking.setUpdatedAt(now);
+        event.addBooking(booking); // keeps event.getBookings() in sync with the owning FK side
         
         event.setAvailableSeats(event.getAvailableSeats() - numberOfSeats);
         event.setUpdatedAt(now);
