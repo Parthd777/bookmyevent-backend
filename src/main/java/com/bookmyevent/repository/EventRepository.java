@@ -7,6 +7,7 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
 
 @Repository
 public interface EventRepository extends JpaRepository<Event, Long> {
@@ -17,6 +18,16 @@ public interface EventRepository extends JpaRepository<Event, Long> {
     @Query("select e from Event e join fetch e.venue join fetch e.createdBy " +
             "where e.availableSeats > 0 order by e.eventDate asc")
     List<Event> findAvailableEventsWithDetails();
+
+    @Query(value = "select e from Event e join fetch e.venue join fetch e.createdBy",
+            countQuery = "select count(e) from Event e")
+    org.springframework.data.domain.Page<Event> findAllWithDetails(org.springframework.data.domain.Pageable pageable);
+
+    @Query("select e from Event e join fetch e.venue join fetch e.createdBy")
+    List<Event> findAllWithDetailsUnpaged();
+
+    @Query("select e from Event e join fetch e.venue join fetch e.createdBy where e.id = :id")
+    Optional<Event> findByIdWithDetails(@Param("id") long id);
 
     @Query("select e from Event e where e.venue.city = :city and e.eventDate >= :from " +
             "order by e.eventDate asc")

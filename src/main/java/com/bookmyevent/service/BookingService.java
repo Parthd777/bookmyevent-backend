@@ -7,6 +7,7 @@ import com.bookmyevent.model.Event;
 import com.bookmyevent.model.User;
 import com.bookmyevent.repository.BookingRepository;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.util.List;
@@ -24,6 +25,7 @@ public class BookingService {
         this.userService = userService;
     }
     
+    @Transactional
     public Booking createBooking(long userId, long eventId, int numberOfSeats) {
         User user = userService.findById(userId);
         Event event = eventService.findById(eventId);
@@ -46,12 +48,12 @@ public class BookingService {
     }
     
     public Booking getBookingById(long id) {
-        return bookingRepository.findById(id)
+        return bookingRepository.findByIdWithDetails(id)
             .orElseThrow(() -> new RuntimeException("Booking not found"));
     }
 
     public List<Booking> findAll() {
-        return bookingRepository.findAll();
+        return bookingRepository.findAllWithDetails();
     }
 
     public Booking findById(long id) {

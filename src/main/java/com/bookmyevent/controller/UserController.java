@@ -49,7 +49,8 @@ public class UserController {
         var user = userService.registerUser(
                 request.getName(),
                 request.getEmail(),
-                request.getRole().toUpperCase()
+                request.getRole().toUpperCase(),
+                request.getPassword()
         );
         return ResponseEntity.status(HttpStatus.CREATED).body(UserResponse.from(user));
     }

@@ -14,7 +14,7 @@ public class UserResponse {
         r.id = user.getId();
         r.name = user.getName();
         r.email = user.getEmail();
-        r.role = user.getRole();
+        r.role = user.getRole().name();
         return r;
     }
 

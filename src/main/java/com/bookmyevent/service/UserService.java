@@ -2,7 +2,10 @@ package com.bookmyevent.service;
 
 import com.bookmyevent.exception.UserNotFoundException;
 import com.bookmyevent.model.User;
+import com.bookmyevent.model.UserRole;
 import com.bookmyevent.repository.UserRepository;
+
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
@@ -12,13 +15,16 @@ import java.util.List;
 public class UserService {
     
     private final UserRepository userRepository;
-    
-    public UserService(UserRepository userRepository) {
+    private final PasswordEncoder passwordEncoder;
+
+    public UserService(UserRepository userRepository, PasswordEncoder passwordEncoder) {
         this.userRepository = userRepository;
+        this.passwordEncoder = passwordEncoder;
     }
     
-    public User registerUser(String name, String email, String role) {
-        User user = new User(name, email, role);
+    public User registerUser(String name, String email, String role, String password) {
+        User user = new User(name, email, UserRole.valueOf(role.toUpperCase()));
+        user.setPasswordHash(passwordEncoder.encode(password));
         LocalDateTime now = LocalDateTime.now(ZoneId.systemDefault());
         user.setCreatedAt(now);
         user.setUpdatedAt(now);

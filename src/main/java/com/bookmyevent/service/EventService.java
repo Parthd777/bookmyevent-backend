@@ -39,16 +39,16 @@ public class EventService {
     }
     
     public Event findById(long id) {
-        return eventRepository.findById(id)
+        return eventRepository.findByIdWithDetails(id)
             .orElseThrow(() -> new RuntimeException("Event not found"));
     }
     
     public Page<Event> findAllEvents(@NonNull Pageable pageable) {
-        return eventRepository.findAll(pageable);
+        return eventRepository.findAllWithDetails(pageable);
     }
 
     public List<Event> listEvents() {
-        return eventRepository.findAll();
+        return eventRepository.findAllWithDetailsUnpaged();
     }
 
     public List<Event> listEventsWithAvailableSeats() {

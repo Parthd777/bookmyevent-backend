@@ -21,7 +21,6 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
-import java.util.Objects;
 import java.util.Set;
 
 @RestController
@@ -81,13 +80,9 @@ public class EventController {
             @RequestParam(defaultValue = "ASC") String direction) {
 
         String safeSortBy = SORTABLE_FIELDS.contains(sortBy) ? sortBy : "eventDate";
-        String normalizedDirection = Objects.requireNonNullElse(direction, "ASC").toUpperCase();
-        Sort.Direction safeDirection;
-        try {
-            safeDirection = Sort.Direction.valueOf(normalizedDirection);
-        } catch (IllegalArgumentException ex) {
-            safeDirection = Sort.Direction.ASC;
-        }
+        Sort.Direction safeDirection = "DESC".equalsIgnoreCase(direction)
+                ? Sort.Direction.DESC
+                : Sort.Direction.ASC;
 
         Pageable pageable = PageRequest.of(
                 Math.max(page, 0),
