@@ -13,7 +13,7 @@ public class CreateUserRequest {
     @Email(message = "email must be a valid email address")
     private String email;
 
-    @NotBlank(message = "role must not be blank")
+    // Honoured only for callers with ROLE_ADMIN; anonymous signups are always CUSTOMER.
     @Pattern(regexp = "ADMIN|CUSTOMER", message = "role must be ADMIN or CUSTOMER")
     private String role;
 

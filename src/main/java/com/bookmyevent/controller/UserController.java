@@ -6,6 +6,7 @@ import com.bookmyevent.service.UserService;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -45,11 +46,21 @@ public class UserController {
      * Returns 201 Created with the created user body.
      */
     @PostMapping
-    public ResponseEntity<UserResponse> registerUser(@Valid @RequestBody CreateUserRequest request) {
+    public ResponseEntity<UserResponse> registerUser(
+            @Valid @RequestBody CreateUserRequest request, Authentication authentication) {
+
+        boolean callerIsAdmin = authentication != null && authentication.getAuthorities().stream()
+                .anyMatch(authority -> "ROLE_ADMIN".equals(authority.getAuthority()));
+
+        // Anonymous callers cannot choose their own role, otherwise anyone could self-grant ADMIN.
+        String role = (callerIsAdmin && request.getRole() != null)
+                ? request.getRole().toUpperCase()
+                : "CUSTOMER";
+
         var user = userService.registerUser(
                 request.getName(),
                 request.getEmail(),
-                request.getRole().toUpperCase(),
+                role,
                 request.getPassword()
         );
         return ResponseEntity.status(HttpStatus.CREATED).body(UserResponse.from(user));

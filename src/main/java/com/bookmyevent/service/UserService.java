@@ -1,5 +1,6 @@
 package com.bookmyevent.service;
 
+import com.bookmyevent.exception.BookingNotAllowedException;
 import com.bookmyevent.exception.UserNotFoundException;
 import com.bookmyevent.model.User;
 import com.bookmyevent.model.UserRole;
@@ -23,6 +24,10 @@ public class UserService {
     }
     
     public User registerUser(String name, String email, String role, String password) {
+        // Duplicate emails would make the login identity ambiguous.
+        if (userRepository.findByEmail(email).isPresent()) {
+            throw new BookingNotAllowedException("An account with this email already exists.");
+        }
         User user = new User(name, email, UserRole.valueOf(role.toUpperCase()));
         user.setPasswordHash(passwordEncoder.encode(password));
         LocalDateTime now = LocalDateTime.now(ZoneId.systemDefault());
