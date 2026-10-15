@@ -4,6 +4,8 @@ import com.bookmyevent.dto.request.CreateBookingRequest;
 import com.bookmyevent.dto.response.BookingResponse;
 import com.bookmyevent.service.BookingService;
 import jakarta.validation.Valid;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -31,10 +33,26 @@ public class BookingController {
      * Returns 409 Conflict if no seats available, 404 if user/event not found.
      */
     @PostMapping
-    public ResponseEntity<BookingResponse> createBooking(@Valid @RequestBody CreateBookingRequest request) {
+    public ResponseEntity<BookingResponse> createBooking(@Valid @RequestBody CreateBookingRequest request,
+                                                        @AuthenticationPrincipal UserDetails principal) {
+        bookingService.validateBookingOwner(request.getUserId(), principal.getUsername());
         var booking = bookingService.createBooking(
                 request.getUserId(), request.getEventId(), request.getSeatsBooked());
         return ResponseEntity.status(HttpStatus.CREATED).body(BookingResponse.from(booking));
+    }
+
+    @PostMapping("/holds")
+    public ResponseEntity<BookingResponse> holdSeats(@Valid @RequestBody CreateBookingRequest request,
+                                                    @AuthenticationPrincipal UserDetails principal) {
+        bookingService.validateBookingOwner(request.getUserId(), principal.getUsername());
+        var booking = bookingService.holdSeats(request.getUserId(), request.getEventId(), request.getSeatsBooked());
+        return ResponseEntity.status(HttpStatus.CREATED).body(BookingResponse.from(booking));
+    }
+
+    @PostMapping("/{id}/confirm")
+    public ResponseEntity<BookingResponse> confirmHold(@PathVariable long id,
+                                                      @AuthenticationPrincipal UserDetails principal) {
+        return ResponseEntity.ok(BookingResponse.from(bookingService.confirmHold(id, principal.getUsername())));
     }
 
     /** GET /bookings */

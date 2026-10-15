@@ -50,10 +50,7 @@ public class EventController {
 
     @GetMapping
     public ResponseEntity<List<EventResponse>> listEvents() {
-        List<EventResponse> response = eventService.listEvents().stream()
-                .map(EventResponse::from)
-                .toList();
-        return ResponseEntity.ok(response);
+        return ResponseEntity.ok(eventService.listEventResponses());
     }
 
     @GetMapping("/available")

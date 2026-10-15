@@ -7,6 +7,7 @@ import jakarta.persistence.FetchType;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
+import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "bookings")
@@ -24,6 +25,7 @@ public class Booking extends BaseEntity {
     
     @Enumerated(EnumType.STRING)
     private BookingStatus status;
+    private LocalDateTime expiresAt;
 
     public Booking() {}
     public Booking(User user, Event event, int numberOfSeats, BookingStatus status) {
@@ -44,4 +46,6 @@ public class Booking extends BaseEntity {
     
     public BookingStatus getStatus() { return status; }
     public void setStatus(BookingStatus status) { this.status = status; }
+    public LocalDateTime getExpiresAt() { return expiresAt; }
+    public void setExpiresAt(LocalDateTime expiresAt) { this.expiresAt = expiresAt; }
 }
